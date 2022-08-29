@@ -76,6 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     _initializeFutures();
+    super.initState();
   }
 
   @override
@@ -92,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
               AnimatedShader(
                 program: FragmentProgramManager.lookup(_shaderKey),
                 duration: const Duration(seconds: 2),
-                size: Size(300, 300),
+                size: const Size(300, 300),
               )
             else
               const Text('Loading...'),
