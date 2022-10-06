@@ -17,7 +17,6 @@
 // noted below as `TODO` items. The API is changing to allow re-using
 // the float uniform buffer between frames.
 
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -104,48 +103,18 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-// TODO(zanderso): Restore this after
-// https://github.com/flutter/engine/pull/35253 lands.
-// /// A custom painter that updates the float uniform at index 0 with the
-// /// current animation value and uses the shader to configure the Paint
-// /// object that draws a rectangle onto the canvas.
-// class AnimatedShaderPainter extends CustomPainter {
-//   AnimatedShaderPainter(this.shader, this.animation) : super(repaint: animation);
+/// A custom painter that updates the float uniform at index 0 with the
+/// current animation value and uses the shader to configure the Paint
+/// object that draws a rectangle onto the canvas.
+class AnimatedShaderPainter extends CustomPainter {
+  AnimatedShaderPainter(this.shader, this.animation) : super(repaint: animation);
 
-//   final ui.FragmentShader shader;
-//   final Animation<double> animation;
-
-//   @override
-//   void paint(Canvas canvas, Size size) {
-//     shader.floatUniforms[0] = animation.value;
-//     canvas.drawRect(Offset.zero & size, Paint()..shader = shader);
-//   }
-
-//   @override
-//   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-// }
-
-// TODO(zanderso): Delete this after
-// https://github.com/flutter/engine/pull/35253 lands.
-/// A custom painter that uses a ui.FragmentProgram object to generate a
-/// Shader. The float uniform at index 0 is the value of the animation. The
-/// Shader is supplied to the Paint object used to draw a rectangle onto the
-/// canvas.
-class AnimatedProgramPainter extends CustomPainter {
-  AnimatedProgramPainter(this.program, this.animation) : super(repaint: animation);
-
-  final ui.FragmentProgram program;
+  final ui.FragmentShader shader;
   final Animation<double> animation;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final Shader shader = program.shader(
-      floatUniforms: Float32List.fromList(<double>[
-        animation.value,
-        size.width.toDouble(),
-        size.height.toDouble(),
-      ]),
-    );
+    shader.setFloat(0, animation.value);
     canvas.drawRect(Offset.zero & size, Paint()..shader = shader);
   }
 
@@ -173,19 +142,15 @@ class AnimatedShader extends StatefulWidget {
 class AnimatedShaderState extends State<AnimatedShader>
                           with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  // TODO(zanderso): Persist the shader after
-  // https://github.com/flutter/engine/pull/35253 lands.
-  // late final ui.FragmentShader _shader;
+  late final ui.FragmentShader _shader;
 
   @override
   void initState() {
     super.initState();
-    // TODO(zanderso): Initialize the shader after
-    // https://github.com/flutter/engine/pull/35253 lands.
-    // _shader = widget.program.fragmentShader()
-    //   ..floatUniforms[0] = 0.0
-    //   ..floatUniforms[1] = widget.size.width.toDouble()
-    //   ..floatUniforms[2] = widget.size.height.toDouble();
+    _shader = widget.program.fragmentShader()
+      ..setFloat(0, 0.0)
+      ..setFloat(1, widget.size.width.toDouble())
+      ..setFloat(2, widget.size.height.toDouble());
     _controller = AnimationController(
       vsync: this,
       duration: widget.duration,
@@ -217,19 +182,14 @@ class AnimatedShaderState extends State<AnimatedShader>
   @override
   void dispose() {
     _controller.dispose();
-    // TODO(zanderso): Dispose the shader after
-    // https://github.com/flutter/engine/pull/35253 lands.
-    // _shader.dispose();
+    _shader.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      // TODO(zanderso): Use this instead after the PR at
-      // https://github.com/flutter/engine/pull/35253 lands.
-      //painter: AnimatedShaderPainter(_shader, _controller),
-      painter: AnimatedProgramPainter(widget.program, _controller),
+      painter: AnimatedShaderPainter(_shader, _controller),
       size: widget.size,
     );
   }
