@@ -147,8 +147,6 @@ class AnimatedShaderState extends State<AnimatedShader>
   @override
   void initState() {
     super.initState();
-    // TODO(zanderso): Initialize the shader after
-    // https://github.com/flutter/engine/pull/35253 lands.
     _shader = widget.program.fragmentShader()
       ..setFloat(0, 0.0)
       ..setFloat(1, widget.size.width.toDouble())
