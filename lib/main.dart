@@ -139,13 +139,10 @@ class AnimatedProgramPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final Shader shader = program.shader(
-      floatUniforms: Float32List.fromList(<double>[
-        animation.value,
-        size.width.toDouble(),
-        size.height.toDouble(),
-      ]),
-    );
+    ui.FragmentShader shader = program.fragmentShader();
+    shader.setFloat(0, animation.value);
+    shader.setFloat(1, size.width.toDouble());
+    shader.setFloat(2, size.height.toDouble());
     canvas.drawRect(Offset.zero & size, Paint()..shader = shader);
   }
 
