@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include <flutter/runtime_effect.glsl>
+
 layout(location = 0) uniform float iTime;
 layout(location = 1) uniform vec2 iResolution;
 
@@ -10,7 +12,7 @@ layout(location = 0) out vec4 fragColor;
 void main()
 {
   // Normalized pixel coordinates (from 0 to 1)
-  vec2 uv = gl_FragCoord.xy/iResolution;
+  vec2 uv = FlutterFragCoord().xy/iResolution;
   float t = 4 * iTime;
 
   // Time varying pixel color

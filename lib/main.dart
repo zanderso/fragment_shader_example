@@ -6,16 +6,13 @@
 // 'shader' section of the 'flutter' manifest in the pubspec.yaml file.
 // A shader asset is loaded as a [FragmentProgram] object using the
 // `FragmentProgram.fromAsset()` method. Then, [Shader] objects can be obtained
-// by passing uniform values to the `FragmentProgram.shader()` method.
+// from the `FragmentProgram.fragmentShader()` method, and uniforms set on
+// that object using `setFloat(index, value)`.
+//
 // The animation of a shader can be driven by passing the value of a Flutter
 // [Animation] as one of the float uniforms of the shader program. In this
 // example, the value of the animation is expected to be passed as the
 // float uniform at index 0.
-//
-// The changes in https://github.com/flutter/engine/pull/35253 are a
-// breaking change to the [FragmentProgram] API. The compensating changes are
-// noted below as `TODO` items. The API is changing to allow re-using
-// the float uniform buffer between frames.
 
 import 'dart:ui' as ui;
 
@@ -91,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
             if (_futuresInitialized)
               AnimatedShader(
                 program: FragmentProgramManager.lookup(_shaderKey),
-                duration: const Duration(seconds: 2),
+                duration: const Duration(seconds: 10),
                 size: const Size(300, 300),
               )
             else
@@ -147,13 +144,15 @@ class AnimatedShaderState extends State<AnimatedShader>
   @override
   void initState() {
     super.initState();
-    _shader = widget.program.fragmentShader()
-      ..setFloat(0, 0.0)
-      ..setFloat(1, widget.size.width.toDouble())
-      ..setFloat(2, widget.size.height.toDouble());
+    _shader = widget.program.fragmentShader();
+    _shader.setFloat(0, 0.0);
+    _shader.setFloat(1, widget.size.width.toDouble());
+    _shader.setFloat(2, widget.size.height.toDouble());
     _controller = AnimationController(
       vsync: this,
       duration: widget.duration,
+      lowerBound: 0.0,
+      upperBound: 10.0,
     )
     ..addListener(() {
       setState(() {});
